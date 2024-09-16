@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css?v=1.0.3}" type="text/css">
+    <script th:src="@{/js/timerScript.js?v=1.0.3}" type="text/javascript"></script>
+    <script th:src="@{/js/websocketScript.js?v=1.0.3}" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js" integrity="sha512-Tp59ajolL5b7bHPv8WsEfdNXqA0bq2NohJ9jK9yy+HRCvwGpjdpc8ay3F2KtbU9dC22QIOS7ek1n2Vep3ohqtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js" integrity="sha512-tL4PIUsPy+Rks1go4kQG8M8/ItpRMvKnbBjQm4d2DQnFwgcBYRRN00QdyQnWSCwNMsoY/MfJY8nHp2CzlNdtZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Document</title>
+</head>
+<body>
+<div class="contacts" onload="disconnect();">
+    <div>
+        <div>
+<!--            <input class="input" type="text" id="chatId" placeholder="Chat name"/>-->
+<!--            <br>-->
+<!--            <input type="radio" class="radio" value="1 Hour" id="01:00:00" name="duration">-->
+<!--            <label for="01:00:00">1 Hour</label><br>-->
+<!--            <input type="radio" class="radio" value="1 Day" id="24:00:00" name="duration">-->
+<!--            <label for="24:00:00">1 Day</label><br>-->
+<!--            <input type="radio" class="radio" value="1 Week" id="168:00:00" name="duration">-->
+<!--            <label for="168:00:00">1 Week</label><br>-->
+<!--            <input type="radio" class="radio" value="3 Seconds" id="00:00:03" name="duration">-->
+<!--            <label for="00:00:03">3 Seconds</label><br>-->
+            <form id="roomForm" th:object="${room}" method="POST">
+                <input id="chatId" type="text" th:field="${room.roomName}"/>
+                <br>
+<!--                <input type="radio" class="radio" value="1 Hour" id="01:00:00" name="duration" th:field="*{expirationTime}">-->
+                <input id="inputTime" type="text" th:field="${room.expirationTime}">
+<!--                <input type="hidden" th:field="${room.chatterLogin}" th:value="${chatter.login}">-->
+                <button type="submit">Submit TL</button>
+            </form>
+        </div>
+        <br />
+        <div id="left">
+            <button id="connect" onclick="connect();" >Connect</button>
+            <button id="disconnect" disabled="disabled" onclick="disconnect();">
+                Disconnect
+            </button>
+            <button id="create" onclick="createRoom();">Create Room</button>
+        </div>
+        <br />
+    </div>
+</div>
+<div class="chat">
+    <div id="top">
+        <div class="profile" id="profile" th:text="${chatter.login}"></div>
+        <div class="timer" id="timer"></div>
+        <div class="room" id="chatName" th:text="${roomName}"></div>
+    </div>
+    <div class="window" id="chatWindow">
+        <div id="response"></div>
+    </div>
+    <div class="bottom" id="but">
+        <input type="text" class="textField" placeholder="Message" maxlength="1000" id="textField">
+        <button id="sendMessage" onclick="sendMessage();"></button>
+    </div>
+</div>
+<div class="settings">
+</div>
+<script>
+
+    //let profile = document.getElementById("profile");
+        //let url = window.location.href;
+        //let urlArr = url.split('/');
+        //profile.textContent = urlArr[urlArr.length-1];
+
+    document.getElementById("textField").addEventListener("keypress",function(event){
+        if (event.key == "Enter"){
+            event.preventDefault();
+            sendMessage();
+        }
+    })
+
+
+
+</script>
+</body>
+</html>

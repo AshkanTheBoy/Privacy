@@ -1,0 +1,145 @@
+:root{
+    color: rgb(0, 255, 0);
+}
+
+.input{
+    background-color: black;
+    outline: none;
+    color: rgb(0,255,0);
+}
+
+body{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color:rgb(7, 7, 14);
+    min-width: 400px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    min-height: 100%;
+}
+
+.chat{
+    margin-top: 0;
+    padding-top: 0;
+    display: grid;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-template-rows: 5% 85% 10%;
+    background-color: black;
+    border: 5px solid rgb(0, 255, 0);
+    min-height: 97vh;
+    min-width: 400px;
+    width: 40vw;
+}
+
+.timer{
+    border: 5px solid rgb(0, 255, 0);
+    width: 35%;
+    justify-self: center;
+    font-size: 150%;
+    text-align: center;
+}
+
+#top{
+   display: flex;
+}
+
+.profile{
+    border: 5px solid rgb(0, 255, 0);
+    width: 30%;
+    font-size: 150%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#chatName{
+    border: 5px solid rgb(0, 255, 0);
+    width: 31%;
+    font-size: 150%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#response{
+    border: 5px solid rgb(0, 255, 0);
+    min-width: 10vw;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    overflow-y: auto;
+    scrollbar-width: none;
+    height: 82vh;
+}
+
+.textField{
+    border: 1px solid rgb(0, 255, 0);
+    background-color: black;
+    color:rgb(0, 255, 0);
+    width: 98%;
+    height: 95%;
+    outline: none;
+}
+
+.button,#sendMessage{
+    border: 5px solid rgb(0, 255, 0);
+    margin: 10% 10% 10% 10%;
+    border-radius: 0px;
+}
+
+.timerButton{
+    border: 5px solid rgb(0, 255, 0);
+    margin-left: 1%;
+    border-radius: 0px;
+}
+
+.button:hover,.timerButton:hover,#sendMessage:hover{
+    background-color: black;
+}
+
+.bottom{
+    display: grid;
+    grid-template-columns: 90% 10%;
+    border: 5px solid rgb(0, 255, 0);
+    overflow-y: auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    text-wrap: wrap;
+    line-break: auto;
+    overflow-wrap: anywhere;
+}
+
+.settings{
+    border: 5px solid rgb(0, 255, 0);
+    background-color: black;
+}
+
+.contacts{
+    border: 5px solid rgb(0, 255, 0);
+    background-color: black;
+}
+
+p{
+    border-width: 1px 0px 1px 0px;
+    border-style: solid;
+    border-color: rgb(0,255,0);
+    width: 100%;
+}
+
+table{
+    width: 100%;
+}
+
+tr{
+    border-width: 3px 0px 3px 0px;
+    border-style: solid;
+    border-color: rgb(0,255,0);
+    display: flex;
+}
+tr:hover{
+    background-color: white;
+}
+
+td{
+    width: 100%;
+}
