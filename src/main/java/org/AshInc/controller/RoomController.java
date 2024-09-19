@@ -7,7 +7,6 @@ import org.AshInc.service.ChatterService;
 import org.AshInc.service.MessageService;
 import org.AshInc.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

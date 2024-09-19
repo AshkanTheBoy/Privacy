@@ -14,23 +14,10 @@
 <div class="contacts" onload="disconnect();">
     <div>
         <div>
-<!--            <input class="input" type="text" id="chatId" placeholder="Chat name"/>-->
-<!--            <br>-->
-<!--            <input type="radio" class="radio" value="1 Hour" id="01:00:00" name="duration">-->
-<!--            <label for="01:00:00">1 Hour</label><br>-->
-<!--            <input type="radio" class="radio" value="1 Day" id="24:00:00" name="duration">-->
-<!--            <label for="24:00:00">1 Day</label><br>-->
-<!--            <input type="radio" class="radio" value="1 Week" id="168:00:00" name="duration">-->
-<!--            <label for="168:00:00">1 Week</label><br>-->
-<!--            <input type="radio" class="radio" value="3 Seconds" id="00:00:03" name="duration">-->
-<!--            <label for="00:00:03">3 Seconds</label><br>-->
             <form id="roomForm" th:object="${room}" method="POST">
                 <input id="chatId" type="text" th:field="${room.roomName}"/>
                 <br>
-<!--                <input type="radio" class="radio" value="1 Hour" id="01:00:00" name="duration" th:field="*{expirationTime}">-->
                 <input id="inputTime" type="text" th:field="${room.expirationTime}">
-<!--                <input type="hidden" th:field="${room.chatterLogin}" th:value="${chatter.login}">-->
-                <button type="submit">Submit TL</button>
             </form>
         </div>
         <br />
@@ -39,7 +26,9 @@
             <button id="disconnect" disabled="disabled" onclick="disconnect();">
                 Disconnect
             </button>
+            <br>
             <button id="create" onclick="createRoom();">Create Room</button>
+            <button onclick="logOut();">Log out</button>
         </div>
         <br />
     </div>

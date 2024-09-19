@@ -7,8 +7,10 @@
 <body>
     <form method="POST" action="/add" th:object="${chatter}">
         <input type="text" placeholder="Login" id="login" th:field="*{login}">
+        <br>
         <input type="password" placeholder="Password" id="password" th:field="*{passwordHash}">
         <button type="submit">Register</button>
     </form>
+<a href="/login">Log in</a>
 </body>
 </html>

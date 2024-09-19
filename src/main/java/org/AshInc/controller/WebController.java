@@ -24,8 +24,34 @@ public class WebController {
     public String getMain(@PathVariable("login") String login, HttpSession session, Model model){
         Chatter chatter = (Chatter) session.getAttribute("chatter");
         model.addAttribute("chatter", chatter);
-        model.addAttribute("room", new Room());
+        Room room = (Room) session.getAttribute("room");
+        if (room!=null){
+            model.addAttribute("room",room);
+            model.addAttribute("roomName",room.getRoomName());
+        } else {
+            model.addAttribute("room", new Room());
+        }
         return "main";
     }
 
+    @GetMapping({"/login","","/"})
+    public String loginUser(Model model){
+        model.addAttribute("chatter", new Chatter());
+        return "login";
+    }
+
+    @GetMapping({"/signup"})
+    public String registerUser(Model model){
+        model.addAttribute("chatter", new Chatter());
+        return "register";
+    }
+
+    @GetMapping("/logout")
+    public String logOut(HttpSession session){
+        session.invalidate();
+        return "redirect:/login";
+    }
+
 }
+
+

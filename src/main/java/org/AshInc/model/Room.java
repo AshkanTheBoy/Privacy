@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.AshInc.timer.Timer;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,8 +29,11 @@ public class Room {
     private String roomName;
     @Transient
     private String chatterLogin;
+    @Transient
+    private Timer timer;
     private Integer slots = 0;
     private String expirationTime;
+
     @OneToMany(mappedBy = "room")
     @JsonManagedReference
     private List<Message> messages = new ArrayList<>();

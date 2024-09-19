@@ -5,19 +5,22 @@ import org.AshInc.model.Room;
 import org.AshInc.service.MessageService;
 import org.AshInc.service.ChatterService;
 import org.AshInc.service.RoomService;
+import org.AshInc.timer.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import java.util.Date;
 import org.AshInc.model.Message;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-@Controller
+@RestController
 public class MessagingController {
 
     private final SimpMessagingTemplate template;
@@ -51,4 +54,24 @@ public class MessagingController {
         template.convertAndSend("/topic/"+chatName,
                 new OutputMessage(message.getChatterLogin(), message.getText(),time));
     }
+
+    @GetMapping("/startTimer/{duration}/{roomName}")
+    public void startTimer(@PathVariable("duration") String duration, @PathVariable("roomName") String roomName){
+        Pattern pattern = Pattern.compile("^[0-9]{3}:[0-9]{2}:[0-9]{2}$");
+        Matcher matcher = pattern.matcher(duration);
+        if (matcher.matches()){
+            Room room = roomService.findByChatName(roomName);
+            room.setTimer(new Timer(template));
+            room.getTimer().startTimer(roomName,duration);
+        } else {
+            System.out.println("Wrong timer value");
+        }
+    }
+
+    @GetMapping("/stopTimer/{roomName}")
+    public void stopTimer(@PathVariable("roomName") String roomName) {
+        Room room = roomService.findByChatName(roomName);
+        room.getTimer().stopTimer();
+    }
+
 }

@@ -45,8 +45,14 @@ public class RoomsRestController {
     public ResponseEntity<Boolean> verify(@RequestParam(name = "login") String login, @RequestParam(name = "roomName") String roomName, HttpSession session){
         Room currRoom = (Room) session.getAttribute("room");
         Chatter currChatter = (Chatter) session.getAttribute("chatter");
-//        System.out.println(currRoom.getRoomName()+" "+currChatter.getLogin());
         boolean isValid = login.equals(currChatter.getLogin()) && roomName.equals(currRoom.getRoomName());
+        return ResponseEntity.ok(isValid);
+    }
+
+    @GetMapping("/verifyLogin")
+    public ResponseEntity<Boolean> verifyLogin(@RequestParam(name = "login") String login, HttpSession session){
+        Chatter currChatter = (Chatter) session.getAttribute("chatter");
+        boolean isValid = login.equals(currChatter.getLogin());
         return ResponseEntity.ok(isValid);
     }
 }

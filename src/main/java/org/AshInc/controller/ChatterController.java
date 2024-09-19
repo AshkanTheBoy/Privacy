@@ -22,9 +22,8 @@ public class ChatterController {
     }
 
     @PostMapping(value = "/add")
-    public String addNewChatter(@ModelAttribute("chatter") Chatter chatter, HttpSession session){
-        System.out.println(chatter);
-        session.setAttribute("chatter",chatter);
+    public String addNewChatter(@ModelAttribute("chatter") Chatter chatter){
+//        session.setAttribute("chatter",chatter);
         String login = chatter.getLogin();
         String password = chatter.getPasswordHash();
         if ((!login.isBlank()||!login.isEmpty())&&(!password.isBlank()||!password.isEmpty())){
@@ -32,17 +31,28 @@ public class ChatterController {
                 System.out.println("This user already exists");
             } else {
                 chatterService.addNewUser(chatter);
-                String redirect = String.format("redirect:/main");
-                System.out.println(redirect);
-                return "redirect:/main/"+chatter.getLogin();
+                return "redirect:/login";
             }
         }
         return "redirect:/";
     }
 
-    @GetMapping({"/",""})
-    public String registerUser(Model model){
-        model.addAttribute("chatter", new Chatter());
-        return "index";
+    @GetMapping(value = "/get")
+    public String searchChatter(@ModelAttribute("chatter") Chatter chatter, HttpSession session){
+        String login = chatter.getLogin();
+        String password = chatter.getPasswordHash();
+        if ((!login.isBlank()||!login.isEmpty())&&(!password.isBlank()||!password.isEmpty())){
+            Chatter pendingChatter = chatterService.findUserByLogin(login);
+            if (pendingChatter!=null&&password.equals(pendingChatter.getPasswordHash())){
+                    session.setAttribute("chatter",chatter);
+                    return "redirect:/main/"+login;
+            } else {
+                System.out.println("Incorrect login or password");
+                return "redirect:/login";
+            }
+        }
+        return "redirect:/login";
     }
+
+
 }

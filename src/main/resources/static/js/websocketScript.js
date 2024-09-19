@@ -15,9 +15,11 @@ async function createRoom(){
         let roomAvailable = await response.json();
         if (roomAvailable){
             roomNameField.textContent = chatName.value;
-            startTimer();
+//            startTimer();
             connectToRoom();
             submitAddForm();
+//            response.then(startScheduledTimer());
+//            startScheduledTimer();
         } else {
             console.log("This room already exists");
             let div = document.getElementById("left");
@@ -30,24 +32,7 @@ async function createRoom(){
     }
 }
 
-function submitAddForm(){
-    let form = document.getElementById("roomForm");
-    const formData = new FormData(form);
-    fetch('http://localhost:8080/addRoom',{
-        method:"POST",
-        body: formData
-    })
-}
 
-
-function submitConnectForm(){
-    let form = document.getElementById("roomForm");
-    const formData = new FormData(form);
-    fetch('http://localhost:8080/connectRoom',{
-        method:"POST",
-        body: formData
-    })
-}
 
 async function connect() {
     let chatName = document.getElementById("chatId");
@@ -55,7 +40,7 @@ async function connect() {
     if (chatName.value.length>0){
         let response = await fetch(`http:\/\/localhost:8080/api/checkCapacity/${chatName.value}`);
         let roomNotFull = await response.json();
-        console.log(roomNotFull);
+//        console.log(roomNotFull);
         if (roomNotFull){
             roomNameField.textContent = chatName.value;
             connectToRoom();
@@ -75,25 +60,17 @@ async function connect() {
 
 function connectToRoom(){
     var chatId = document.getElementById("chatId");
-    console.log(`/topic/${chatId.value}`);
+//    console.log(`/topic/${chatId.value}`);
     var socket = new SockJS(`/chat`);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame) {
         setConnected(true);
-        console.log('Connected: ' +' '+ chatId.value +' '+ frame);
-        console.log(`/topic/${chatId.value}`);
+//        console.log('Connected: ' +' '+ chatId.value +' '+ frame);
+//        console.log(`/topic/${chatId.value}`);
         stompClient.subscribe(`/topic/${chatId.value}`, function(payload) {
             showMessageOutput(JSON.parse(payload.body));
         });
     })
-}
-
-function rejectConnection(){
-    console.log("The room is full");
-}
-
-function disconnect() {
-    deleteRoom();
 }
 
 async function sendMessage() {
@@ -105,11 +82,9 @@ async function sendMessage() {
         const encodedRoomName = encodeURIComponent(chatId.textContent);
         response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
         let responseJson = await response.json();
-        console.log(responseJson);
         if (responseJson){
             var text = textField.value;
             textField.value = '';
-            console.log(`/app/chat/${chatId.textContent}`);
             saveMessage(text,from,chatId.textContent);
             stompClient.send(`/app/chat/${chatId.textContent}`, {},
               JSON.stringify({'chatterLogin':from, 'text':text}));
@@ -128,7 +103,7 @@ async function sendTimerValue(value){
     const encodedRoomName = encodeURIComponent(chatName.textContent);
     response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
-    console.log(responseJson);
+//    console.log(responseJson);
     if (responseJson){
         stompClient.send(`/app/chat/${chatName.textContent}`,{},JSON.stringify({'text':value}));
     } else {
@@ -180,8 +155,9 @@ async function deleteRoom(){
     const encodedRoomName = encodeURIComponent(chatName.textContent);
     response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
-    console.log(responseJson);
+//    console.log(responseJson);
     if (responseJson){
+        stopTimer(chatName.textContent);
         fetch(`http:\/\/localhost:8080/delete/${chatName.textContent}`,{
             method: "DELETE"
         })
@@ -196,5 +172,69 @@ async function deleteRoom(){
             JSON.stringify({'chatterLogin':"System", 'text':"clear"}));
     } else {
         console.log("HTML values do not match with server values");
+    }
+}
+
+function rejectConnection(){
+    console.log("The room is full");
+}
+
+function disconnect() {
+    deleteRoom();
+}
+
+
+function submitAddForm(){
+    let form = document.getElementById("roomForm");
+    const formData = new FormData(form);
+    fetch('http://localhost:8080/addRoom',{
+        method:"POST",
+        body: formData
+    })
+    .then(response=>{
+        if (!response.ok){
+        throw new Error("Response is not ok")}
+    })
+    .then(()=>{
+        startScheduledTimer();
+    })
+}
+
+
+function submitConnectForm(){
+    let form = document.getElementById("roomForm");
+    const formData = new FormData(form);
+    fetch('http://localhost:8080/connectRoom',{
+        method:"POST",
+        body: formData
+    })
+}
+
+function startScheduledTimer(){
+    let roomName = document.getElementById("chatName");
+    let inputTime = document.getElementById("inputTime")
+    fetch(`http:\/\/localhost:8080/startTimer/${inputTime.value}/${roomName.textContent}`,{
+        method:"GET"
+    })
+}
+
+function stopTimer(roomName){
+    fetch(`http:\/\/localhost:8080/stopTimer/${roomName}`,{
+        method:"GET"
+    })
+}
+
+async function logOut(){
+    let chatName = document.getElementById("chatName");
+    let chatterName = document.getElementById("profile");
+    const encodedLogin = encodeURIComponent(chatterName.textContent);
+    const encodedRoomName = encodeURIComponent(chatName.textContent);
+    response = await fetch(`http:\/\/localhost:8080/api/verifyLogin?login=${encodedLogin}`);
+    let responseJson = await response.json();
+    if (responseJson){
+        if (stompClient!==null){
+            stompClient.send(`/app/chat/${chatName.textContent}`, {}, JSON.stringify({'chatterLogin':"System", 'text':"clear"}));
+        }
+        window.location.href = 'http://localhost:8080/logout';
     }
 }
