@@ -14,13 +14,14 @@
 <div class="contacts" onload="disconnect();">
     <div>
         <div>
-            <form id="roomForm" th:object="${room}" method="POST">
+            <form id="roomForm" th:object="${room}">
+                <p class="hidden" id="invalidFields" style="color: red;">Invalid field values</p>
                 <input id="chatId" type="text" th:field="${room.roomName}"/>
                 <br>
                 <input id="inputTime" type="text" th:field="${room.expirationTime}">
             </form>
         </div>
-        <br />
+        <br>
         <div id="left">
             <button id="connect" onclick="connect();" >Connect</button>
             <button id="disconnect" disabled="disabled" onclick="disconnect();">
@@ -30,12 +31,13 @@
             <button id="create" onclick="createRoom();">Create Room</button>
             <button onclick="logOut();">Log out</button>
         </div>
-        <br />
+
+        <br>
     </div>
 </div>
 <div class="chat">
     <div id="top">
-        <div class="profile" id="profile" th:text="${chatter.login}"></div>
+        <div class="profile"  id="profile" th:text="${session.chatter.login}"></div>
         <div class="timer" id="timer"></div>
         <div class="room" id="chatName" th:text="${roomName}"></div>
     </div>

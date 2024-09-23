@@ -33,7 +33,7 @@ public class RoomController {
         return roomService.getAllRooms();
     }
 
-    @PostMapping(value="/connectRoom")
+    @PostMapping(value="/main/{login}")
     public String connectToRoom(@ModelAttribute("room") Room room, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Chatter sessionChatter = (Chatter) session.getAttribute("chatter");
         Chatter chatter = chatterService.findUserByLogin(sessionChatter.getLogin());
@@ -49,10 +49,10 @@ public class RoomController {
                 model.addAttribute("chatter",chatter);
                 roomService.incrementTakenSlots(existingROom);
                 roomService.addNewRoom(existingROom);
-                return "redirect:/main/"+chatter.getLogin();
             }
+            return "redirect:/main/"+chatter.getLogin();
         }
-        return "main";
+        return "redirect:/main/"+chatter.getLogin();
     }
 
     @PostMapping(value = "/addRoom")
@@ -71,10 +71,10 @@ public class RoomController {
                 model.addAttribute("chatter", chatter);
                 roomService.incrementTakenSlots(room);
                 roomService.addNewRoom(room);
-                return "redirect:/main/"+chatter.getLogin();
             }
+            return "redirect:/main/"+chatter.getLogin();
         }
-        return "main";
+        return "redirect:/main/"+chatter.getLogin();
     }
 
     @DeleteMapping(value = "/delete/{roomName}")

@@ -10,25 +10,31 @@ function setConnected(connected) {
 async function createRoom(){
     let chatName = document.getElementById("chatId");
     let roomNameField = document.getElementById("chatName");
-    if (chatName.value.length>0){
-        let response = await fetch(`http:\/\/localhost:8080/api/checkName/${chatName.value}`);
-        let roomAvailable = await response.json();
-        if (roomAvailable){
-            roomNameField.textContent = chatName.value;
-//            startTimer();
-            connectToRoom();
-            submitAddForm();
-//            response.then(startScheduledTimer());
-//            startScheduledTimer();
-        } else {
-            console.log("This room already exists");
-            let div = document.getElementById("left");
-            let p = document.createElement('p');
-            p.appendChild(document.createTextNode("This room already exists"));
-            div.appendChild(p);
-        }
+    let expTime = document.getElementById("inputTime")
+    let errorField = document.getElementById("invalidFields");
+    let response = await fetch(`/api/verifyFields?roomName=${chatName.value}&time=${expTime.value}`);
+    if (response.ok){
+        response = await fetch(`/api/checkName/${chatName.value}`);
+            let roomAvailable = await response.json();
+            if (roomAvailable){
+                if (!errorField.classList.contains("hidden")){
+                    errorField.classList.toggle("hidden");
+                }
+                roomNameField.textContent = chatName.value;
+                connectToRoom();
+                submitAddForm();
+            } else {
+                console.log("This room already exists");
+                let div = document.getElementById("left");
+                let p = document.createElement('p');
+                p.appendChild(document.createTextNode("This room already exists"));
+                div.appendChild(p);
+            }
     } else {
-        console.log("Room name cannot be empty");
+        if (errorField.classList.contains("hidden")){
+            errorField.classList.toggle("hidden");
+        }
+        console.log("Invalid room name or timer value");
     }
 }
 
@@ -38,20 +44,28 @@ async function connect() {
     let chatName = document.getElementById("chatId");
     let roomNameField = document.getElementById("chatName");
     if (chatName.value.length>0){
-        let response = await fetch(`http:\/\/localhost:8080/api/checkCapacity/${chatName.value}`);
+        let response = await fetch(`/api/checkCapacity/${chatName.value}`);
         let roomNotFull = await response.json();
-//        console.log(roomNotFull);
+        console.log(roomNotFull);
         if (roomNotFull){
-            roomNameField.textContent = chatName.value;
-            connectToRoom();
-            submitConnectForm();
-        } else {
-            rejectConnection();
-            let div = document.getElementById("left");
-            let p = document.createElement('p');
-            p.appendChild(document.createTextNode("This room is full"));
-            div.appendChild(p);
+                submitConnectForm();
+//            let response = await fetch(`/api/verifyRoom?roomName=${chatName.value}`);
+//            let roomExists = await response.json();
+//            if (roomExists){
+                roomNameField.textContent = chatName.value;
+                connectToRoom();
         }
+//            } else {
+//
+//            }
+//
+//        } else {
+//            rejectConnection();
+//            let div = document.getElementById("left");
+//            let p = document.createElement('p');
+//            p.appendChild(document.createTextNode("This room is full"));
+//            div.appendChild(p);
+//        }
     } else{
         console.log("Room name cannot be empty");
     }
@@ -80,7 +94,7 @@ async function sendMessage() {
         var from = document.getElementById('profile').textContent;
         const encodedLogin = encodeURIComponent(from);
         const encodedRoomName = encodeURIComponent(chatId.textContent);
-        response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
+        response = await fetch(`/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
         let responseJson = await response.json();
         if (responseJson){
             var text = textField.value;
@@ -101,7 +115,7 @@ async function sendTimerValue(value){
     let chatterName = document.getElementById("profile");
     const encodedLogin = encodeURIComponent(chatterName.textContent);
     const encodedRoomName = encodeURIComponent(chatName.textContent);
-    response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
+    response = await fetch(`/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
 //    console.log(responseJson);
     if (responseJson){
@@ -153,17 +167,17 @@ async function deleteRoom(){
     let chatterName = document.getElementById("profile");
     const encodedLogin = encodeURIComponent(chatterName.textContent);
     const encodedRoomName = encodeURIComponent(chatName.textContent);
-    response = await fetch(`http:\/\/localhost:8080/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
+    response = await fetch(`/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
 //    console.log(responseJson);
     if (responseJson){
         stopTimer(chatName.textContent);
-        fetch(`http:\/\/localhost:8080/delete/${chatName.textContent}`,{
+        fetch(`/delete/${chatName.textContent}`,{
             method: "DELETE"
         })
         .then(response=>{
             if (response.ok){
-                fetch(`http:\/\/localhost:8080/main/${chatterName.textContent}`,{
+                fetch(`/main/${chatterName.textContent}`,{
                     method: "GET"
                 });
             }
@@ -203,8 +217,9 @@ function submitAddForm(){
 
 function submitConnectForm(){
     let form = document.getElementById("roomForm");
+//    form.submit();
     const formData = new FormData(form);
-    fetch('http://localhost:8080/connectRoom',{
+    fetch(`/main/connectRoom`,{
         method:"POST",
         body: formData
     })
@@ -213,13 +228,13 @@ function submitConnectForm(){
 function startScheduledTimer(){
     let roomName = document.getElementById("chatName");
     let inputTime = document.getElementById("inputTime")
-    fetch(`http:\/\/localhost:8080/startTimer/${inputTime.value}/${roomName.textContent}`,{
+    fetch(`/startTimer/${inputTime.value}/${roomName.textContent}`,{
         method:"GET"
     })
 }
 
 function stopTimer(roomName){
-    fetch(`http:\/\/localhost:8080/stopTimer/${roomName}`,{
+    fetch(`/stopTimer/${roomName}`,{
         method:"GET"
     })
 }
@@ -229,7 +244,7 @@ async function logOut(){
     let chatterName = document.getElementById("profile");
     const encodedLogin = encodeURIComponent(chatterName.textContent);
     const encodedRoomName = encodeURIComponent(chatName.textContent);
-    response = await fetch(`http:\/\/localhost:8080/api/verifyLogin?login=${encodedLogin}`);
+    response = await fetch(`/api/verifyLogin?login=${encodedLogin}`);
     let responseJson = await response.json();
     if (responseJson){
         if (stompClient!==null){

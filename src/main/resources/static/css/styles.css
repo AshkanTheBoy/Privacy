@@ -119,6 +119,10 @@ body{
     background-color: black;
 }
 
+table{
+    width: 100%;
+}
+
 p{
     border-width: 1px 0px 1px 0px;
     border-style: solid;
@@ -126,8 +130,8 @@ p{
     width: 100%;
 }
 
-table{
-    width: 100%;
+.hidden{
+    display: none;
 }
 
 tr{

@@ -9,6 +9,7 @@
         <input type="text" placeholder="Login" id="login" th:field="*{login}">
         <br>
         <input type="password" placeholder="Password" id="password" th:field="*{passwordHash}">
+        <p th:text="${error}"></p>
         <button type="submit">Register</button>
     </form>
 <a href="/login">Log in</a>

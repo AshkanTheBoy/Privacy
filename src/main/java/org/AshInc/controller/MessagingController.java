@@ -6,6 +6,7 @@ import org.AshInc.service.MessageService;
 import org.AshInc.service.ChatterService;
 import org.AshInc.service.RoomService;
 import org.AshInc.timer.Timer;
+import org.AshInc.timer.TimerManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -61,8 +62,10 @@ public class MessagingController {
         Matcher matcher = pattern.matcher(duration);
         if (matcher.matches()){
             Room room = roomService.findByChatName(roomName);
-            room.setTimer(new Timer(template));
+            Timer newTimer = new Timer(template);
+            room.setTimer(newTimer);
             room.getTimer().startTimer(roomName,duration);
+            TimerManager.addTimer(roomName, newTimer);
         } else {
             System.out.println("Wrong timer value");
         }
@@ -70,8 +73,7 @@ public class MessagingController {
 
     @GetMapping("/stopTimer/{roomName}")
     public void stopTimer(@PathVariable("roomName") String roomName) {
-        Room room = roomService.findByChatName(roomName);
-        room.getTimer().stopTimer();
+        TimerManager.getTimer(roomName).stopTimer();
     }
 
 }

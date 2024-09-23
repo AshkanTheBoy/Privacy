@@ -17,9 +17,14 @@ public class RoomService {
        return roomRepository.findAll();
    }
 
-   @Transactional
    public void addNewRoom(Room room){
        roomRepository.save(room);
+   }
+
+   public void updateRoom(Room newRoom){
+       Room oldRoom = roomRepository.findById(newRoom.getId()).orElse(null);
+       newRoom.setId(oldRoom.getId());
+       roomRepository.save(newRoom);
    }
 
    public Room findByChatName(String chatName){

@@ -25,6 +25,14 @@ public class WebController {
         Chatter chatter = (Chatter) session.getAttribute("chatter");
         model.addAttribute("chatter", chatter);
         Room room = (Room) session.getAttribute("room");
+        String error = (String) model.asMap().get("error");
+        if (error != null) {
+            // Optional: Perform additional logic based on the error
+            System.out.println(model.getAttribute("error")!=null);
+            System.out.println("Error message: " + error);
+        } else {
+            System.out.println("Error attribute not found");
+        }
         if (room!=null){
             model.addAttribute("room",room);
             model.addAttribute("roomName",room.getRoomName());
@@ -49,7 +57,7 @@ public class WebController {
     @GetMapping("/logout")
     public String logOut(HttpSession session){
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:http://localhost:8080/login";
     }
 
 }

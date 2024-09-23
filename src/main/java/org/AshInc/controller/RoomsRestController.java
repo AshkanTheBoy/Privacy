@@ -55,4 +55,23 @@ public class RoomsRestController {
         boolean isValid = login.equals(currChatter.getLogin());
         return ResponseEntity.ok(isValid);
     }
+
+    @GetMapping("/verifyRoom")
+    public ResponseEntity<Boolean> verifyRoom(@RequestParam("room") String roomName){
+        boolean roomExists = roomService.findByChatName(roomName)!=null;
+        return ResponseEntity.ok(roomExists);
+    }
+
+    @GetMapping("/verifyFields")
+    public ResponseEntity<String> verifyFields(@RequestParam(name = "roomName") String roomName,
+                                                @RequestParam(name = "time") String time){
+        boolean validFields = (!roomName.isBlank()&&!roomName.isEmpty()) &&
+                              (!time.isEmpty()&&!time.isBlank());
+        if (validFields){
+            return ResponseEntity.ok("OK");
+        } else {
+            return ResponseEntity.badRequest().body("Not vaild request fields");
+        }
+//        return ResponseEntity.ok(validFields);
+    }
 }
