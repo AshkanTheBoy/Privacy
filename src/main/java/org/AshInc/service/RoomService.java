@@ -42,6 +42,10 @@ public class RoomService {
        room.setSlots(room.getSlots()+1);
    }
 
+    public void decrementTakenSlots(Room room){
+        room.setSlots(room.getSlots()-1);
+    }
+
    @Transactional
    public void deleteRoomByName(String name){
        Room room = findByChatName(name);

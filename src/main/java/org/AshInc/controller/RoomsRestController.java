@@ -57,9 +57,13 @@ public class RoomsRestController {
     }
 
     @GetMapping("/verifyRoom")
-    public ResponseEntity<Boolean> verifyRoom(@RequestParam("room") String roomName){
+    public ResponseEntity<Void> verifyRoom(@RequestParam("room") String roomName){
         boolean roomExists = roomService.findByChatName(roomName)!=null;
-        return ResponseEntity.ok(roomExists);
+        if (roomExists){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/verifyFields")
@@ -70,8 +74,7 @@ public class RoomsRestController {
         if (validFields){
             return ResponseEntity.ok("OK");
         } else {
-            return ResponseEntity.badRequest().body("Not vaild request fields");
+            return ResponseEntity.badRequest().body("Not valid request fields");
         }
-//        return ResponseEntity.ok(validFields);
     }
 }

@@ -6,9 +6,9 @@
 </head>
 <body>
     <form method="POST" action="/add" th:object="${chatter}">
-        <input type="text" placeholder="Login" id="login" th:field="*{login}">
+        <input type="text" placeholder="Login" id="login" th:field="${chatter.login}">
         <br>
-        <input type="password" placeholder="Password" id="password" th:field="*{passwordHash}">
+        <input type="password" placeholder="Password" id="password" th:field="${chatter.passwordHash}">
         <p th:text="${error}"></p>
         <button type="submit">Register</button>
     </form>

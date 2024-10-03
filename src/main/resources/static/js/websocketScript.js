@@ -1,40 +1,57 @@
 var stompClient = null;
+let subscription = null;
+let staticErrors;
+document.addEventListener('DOMContentLoaded', () => {
+    var errorFields = document.getElementsByClassName("hidden");
+    staticErrors = Array.from(errorFields);
+
+    console.log('staticErrors:', staticErrors);
+});
 
 function setConnected(connected) {
     document.getElementById('connect').disabled = connected;
     document.getElementById('disconnect').disabled = !connected;
     document.getElementById('response').innerHTML = '';
-
 }
 
 async function createRoom(){
     let chatName = document.getElementById("chatId");
     let roomNameField = document.getElementById("chatName");
     let expTime = document.getElementById("inputTime")
-    let errorField = document.getElementById("invalidFields");
     let response = await fetch(`/api/verifyFields?roomName=${chatName.value}&time=${expTime.value}`);
     if (response.ok){
         response = await fetch(`/api/checkName/${chatName.value}`);
             let roomAvailable = await response.json();
             if (roomAvailable){
-                if (!errorField.classList.contains("hidden")){
-                    errorField.classList.toggle("hidden");
+                for (let error of staticErrors){
+                    if (!error.classList.contains("hidden")){
+                        error.classList.toggle("hidden");
+                    }
                 }
                 roomNameField.textContent = chatName.value;
                 connectToRoom();
                 submitAddForm();
             } else {
-                console.log("This room already exists");
-                let div = document.getElementById("left");
-                let p = document.createElement('p');
-                p.appendChild(document.createTextNode("This room already exists"));
-                div.appendChild(p);
+                let roomExists = document.getElementById("roomExists");
+                for (let error of staticErrors){
+                    if (!error.classList.contains("hidden")){
+                        error.classList.toggle("hidden");
+                    }
+                }
+                if (roomExists.classList.contains("hidden")){
+                    roomExists.classList.toggle("hidden");
+                }
             }
     } else {
+        for (let error of staticErrors){
+            if (!error.classList.contains("hidden")){
+                error.classList.toggle("hidden");
+            }
+        }
+        let errorField = document.getElementById("invalidFields");
         if (errorField.classList.contains("hidden")){
             errorField.classList.toggle("hidden");
         }
-        console.log("Invalid room name or timer value");
     }
 }
 
@@ -44,44 +61,58 @@ async function connect() {
     let chatName = document.getElementById("chatId");
     let roomNameField = document.getElementById("chatName");
     if (chatName.value.length>0){
-        let response = await fetch(`/api/checkCapacity/${chatName.value}`);
-        let roomNotFull = await response.json();
-        console.log(roomNotFull);
-        if (roomNotFull){
-                submitConnectForm();
-//            let response = await fetch(`/api/verifyRoom?roomName=${chatName.value}`);
-//            let roomExists = await response.json();
-//            if (roomExists){
+        let response = await fetch(`/api/verifyRoom?room=${chatName.value}`);
+//        let roomExists = await response.json();
+        if (response.ok){
+            let response = await fetch(`/api/checkCapacity/${chatName.value}`);
+            let roomNotFull = await response.json();
+            if (roomNotFull){
                 roomNameField.textContent = chatName.value;
                 connectToRoom();
+                submitConnectForm();
+            } else {
+                for (let error of staticErrors){
+                    if (!error.classList.contains("hidden")){
+                        error.classList.toggle("hidden");
+                    }
+                }
+                let errorField = document.getElementById("roomIsFull");
+                if (errorField.classList.contains("hidden")){
+                    errorField.classList.toggle("hidden");
+                }
+            }
+        } else {
+            for (let error of staticErrors){
+                if (!error.classList.contains("hidden")){
+                    error.classList.toggle("hidden");
+                }
+            }
+            let errorField = document.getElementById("roomNotExists");
+            if (errorField.classList.contains("hidden")){
+                errorField.classList.toggle("hidden");
+            }
         }
-//            } else {
-//
-//            }
-//
-//        } else {
-//            rejectConnection();
-//            let div = document.getElementById("left");
-//            let p = document.createElement('p');
-//            p.appendChild(document.createTextNode("This room is full"));
-//            div.appendChild(p);
-//        }
     } else{
-        console.log("Room name cannot be empty");
+        for (let error of staticErrors){
+            if (!error.classList.contains("hidden")){
+                error.classList.toggle("hidden");
+            }
+        }
+        let errorField = document.getElementById("invalidFields");
+        if (errorField.classList.contains("hidden")){
+            errorField.classList.toggle("hidden");
+        }
     }
 
 }
 
 function connectToRoom(){
     var chatId = document.getElementById("chatId");
-//    console.log(`/topic/${chatId.value}`);
     var socket = new SockJS(`/chat`);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame) {
         setConnected(true);
-//        console.log('Connected: ' +' '+ chatId.value +' '+ frame);
-//        console.log(`/topic/${chatId.value}`);
-        stompClient.subscribe(`/topic/${chatId.value}`, function(payload) {
+        subscription = stompClient.subscribe(`/topic/${chatId.value}`, function(payload) {
             showMessageOutput(JSON.parse(payload.body));
         });
     })
@@ -117,7 +148,6 @@ async function sendTimerValue(value){
     const encodedRoomName = encodeURIComponent(chatName.textContent);
     response = await fetch(`/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
-//    console.log(responseJson);
     if (responseJson){
         stompClient.send(`/app/chat/${chatName.textContent}`,{},JSON.stringify({'text':value}));
     } else {
@@ -133,6 +163,7 @@ function showMessageOutput(messageOutput) {
         roomName.textContent = null;
         timer.textContent = null;
         if(stompClient != null) {
+            subscription.unsubscribe();
             stompClient.disconnect();
         }
         setConnected(false);
@@ -169,7 +200,6 @@ async function deleteRoom(){
     const encodedRoomName = encodeURIComponent(chatName.textContent);
     response = await fetch(`/api/verify?login=${encodedLogin}&roomName=${encodedRoomName}`);
     let responseJson = await response.json();
-//    console.log(responseJson);
     if (responseJson){
         stopTimer(chatName.textContent);
         fetch(`/delete/${chatName.textContent}`,{
@@ -217,7 +247,6 @@ function submitAddForm(){
 
 function submitConnectForm(){
     let form = document.getElementById("roomForm");
-//    form.submit();
     const formData = new FormData(form);
     fetch(`/main/connectRoom`,{
         method:"POST",
@@ -239,6 +268,14 @@ function stopTimer(roomName){
     })
 }
 
+window.addEventListener('load', () => {
+    let chatName = document.getElementById("chatName");
+    connect();
+    console.log("wtf");
+});
+
+
+
 async function logOut(){
     let chatName = document.getElementById("chatName");
     let chatterName = document.getElementById("profile");
@@ -252,4 +289,8 @@ async function logOut(){
         }
         window.location.href = 'http://localhost:8080/logout';
     }
+}
+
+async function verifyRoom(roomName){
+    return await fetch(`/api/verifyRoom?room=${roomName}`);
 }

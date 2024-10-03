@@ -33,6 +33,19 @@ public class RoomController {
         return roomService.getAllRooms();
     }
 
+    @GetMapping(value = "/decrementRoomSlots/{roomName}")
+    public ResponseEntity<Void> getRoomByName(@PathVariable("roomName")String roomName){
+        Room room = roomService.findByChatName(roomName);
+        if (room==null){
+            return ResponseEntity.notFound().build();
+        }
+        roomService.decrementTakenSlots(room);
+        roomService.updateRoom(room);
+        System.out.println("WTF");
+        System.out.println(room);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping(value="/main/{login}")
     public String connectToRoom(@ModelAttribute("room") Room room, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Chatter sessionChatter = (Chatter) session.getAttribute("chatter");
@@ -58,7 +71,9 @@ public class RoomController {
     @PostMapping(value = "/addRoom")
     public String createNewRoom(@ModelAttribute("room") Room room, HttpSession session, Model model, RedirectAttributes redirectAttributes){
         Chatter sessionChatter = (Chatter) session.getAttribute("chatter");
+        System.out.println(sessionChatter);
         Chatter chatter = chatterService.findUserByLogin(sessionChatter.getLogin());
+        System.out.println(chatter);
         Room existingROom = roomService.findByChatName(room.getRoomName());
         if (existingROom==null){
             boolean validName = (!room.getRoomName().isEmpty())&&(!room.getRoomName().isBlank());

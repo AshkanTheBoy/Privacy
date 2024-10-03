@@ -3,6 +3,7 @@ package org.AshInc.controller;
 import org.AshInc.model.Chatter;
 import org.AshInc.model.Room;
 import org.AshInc.service.ChatterService;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +21,18 @@ public class ChatterController {
     @PostMapping(value = "/add")
     public String addNewChatter(@ModelAttribute("chatter") Chatter chatter, RedirectAttributes redirectAttributes){
 //        session.setAttribute("chatter",chatter);
-        String login = chatter.getLogin();
-        String password = chatter.getPasswordHash();
+        String login = StringEscapeUtils.escapeHtml4(chatter.getLogin());
+        String password = StringEscapeUtils.escapeHtml4(chatter.getPasswordHash());
+        System.out.println(login);
+        System.out.println(password);
         if ((!login.isBlank()||!login.isEmpty())&&(!password.isBlank()||!password.isEmpty())){
             if (chatterService.findUserByLogin(login)!=null){
                 redirectAttributes.addFlashAttribute("error","This user already exists");
                 System.out.println("This user already exists");
                 return "redirect:/signup";
             } else {
+                chatter.setLogin(login);
+                chatter.setPasswordHash(password);
                 chatterService.addNewUser(chatter);
                 return "redirect:/login";
             }
@@ -38,8 +43,8 @@ public class ChatterController {
 
     @GetMapping(value = "/get")
     public String searchChatter(@ModelAttribute("chatter") Chatter chatter, HttpSession session, RedirectAttributes redirectAttributes){
-        String login = chatter.getLogin();
-        String password = chatter.getPasswordHash();
+        String login = StringEscapeUtils.escapeHtml4(chatter.getLogin());
+        String password = StringEscapeUtils.escapeHtml4(chatter.getPasswordHash());
         if ((!login.isBlank()||!login.isEmpty())&&(!password.isBlank()||!password.isEmpty())){
             Chatter pendingChatter = chatterService.findUserByLogin(login);
             if (pendingChatter!=null&&password.equals(pendingChatter.getPasswordHash())){

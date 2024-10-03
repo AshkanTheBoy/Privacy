@@ -11,11 +11,15 @@
     <title>Document</title>
 </head>
 <body>
-<div class="contacts" onload="disconnect();">
+<div class="contacts">
     <div>
         <div>
             <form id="roomForm" th:object="${room}">
-                <p class="hidden" id="invalidFields" style="color: red;">Invalid field values</p>
+                <p class="hidden" id="invalidFields">Invalid field values</p>
+                <p class="hidden" id="roomFull">This room is full</p>
+                <p class="hidden" id="roomExists">This room already exists</p>
+                <p class="hidden" id="roomNotExists">This room does not exist</p>
+                <p class="hidden" id="roomIsFull">This room is full</p>
                 <input id="chatId" type="text" th:field="${room.roomName}"/>
                 <br>
                 <input id="inputTime" type="text" th:field="${room.expirationTime}">
@@ -53,11 +57,6 @@
 </div>
 <script>
 
-    //let profile = document.getElementById("profile");
-        //let url = window.location.href;
-        //let urlArr = url.split('/');
-        //profile.textContent = urlArr[urlArr.length-1];
-
     document.getElementById("textField").addEventListener("keypress",function(event){
         if (event.key == "Enter"){
             event.preventDefault();
@@ -65,7 +64,16 @@
         }
     })
 
-
+    window.addEventListener('beforeunload', () => {
+        let chatName = document.getElementById("chatName");
+    //    console.log(chatName);
+    //    let response = verifyRoom(chatName.textContent);
+    //    if (response.ok){
+    //
+    //    }
+        fetch(`/decrementRoomSlots/${chatName.textContent}`);
+        console.log("qwe");
+    });
 
 </script>
 </body>

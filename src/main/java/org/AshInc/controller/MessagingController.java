@@ -7,6 +7,7 @@ import org.AshInc.service.ChatterService;
 import org.AshInc.service.RoomService;
 import org.AshInc.timer.Timer;
 import org.AshInc.timer.TimerManager;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,6 +42,7 @@ public class MessagingController {
         Room room = roomService.findByChatName(message.getRoomName());
         room.getMessages().add(message);
         message.setRoom(room);
+        message.setText(StringEscapeUtils.escapeHtml4(message.getText()));
         System.out.println(room);
         System.out.println(message);
         messageService.saveMessage(message);

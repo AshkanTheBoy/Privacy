@@ -3,6 +3,7 @@ package org.AshInc.controller;
 import org.AshInc.model.Chatter;
 import org.AshInc.model.Room;
 import org.AshInc.service.ChatterService;
+import org.AshInc.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,19 +21,14 @@ public class WebController {
     @Autowired
     ChatterService chatterService;
 
+    @Autowired
+    RoomService roomService;
+
     @GetMapping(value = "/main/{login}")
     public String getMain(@PathVariable("login") String login, HttpSession session, Model model){
         Chatter chatter = (Chatter) session.getAttribute("chatter");
         model.addAttribute("chatter", chatter);
         Room room = (Room) session.getAttribute("room");
-        String error = (String) model.asMap().get("error");
-        if (error != null) {
-            // Optional: Perform additional logic based on the error
-            System.out.println(model.getAttribute("error")!=null);
-            System.out.println("Error message: " + error);
-        } else {
-            System.out.println("Error attribute not found");
-        }
         if (room!=null){
             model.addAttribute("room",room);
             model.addAttribute("roomName",room.getRoomName());
@@ -57,6 +53,12 @@ public class WebController {
     @GetMapping("/logout")
     public String logOut(HttpSession session){
         session.invalidate();
+        Room sessionRoom = (Room) session.getAttribute("room");
+        if (sessionRoom!=null){
+            Room currRoom = roomService.findByChatName(sessionRoom.getRoomName());
+            roomService.decrementTakenSlots(currRoom);
+            roomService.updateRoom(currRoom);
+        }
         return "redirect:http://localhost:8080/login";
     }
 
