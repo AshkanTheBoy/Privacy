@@ -1,17 +1,34 @@
 var stompClient = null;
 let subscription = null;
 let staticErrors;
+
 document.addEventListener('DOMContentLoaded', () => {
     var errorFields = document.getElementsByClassName("hidden");
     staticErrors = Array.from(errorFields);
+//    console.log('staticErrors:', staticErrors);
+});
 
-    console.log('staticErrors:', staticErrors);
+window.addEventListener('load', async function() {
+    let chatName = document.getElementById("chatId");
+    let roomNameField = document.getElementById("chatName");
+    let responseSession =
+        await fetch(`/api/checkForSession/${roomNameField.textContent}`,{
+            method: "GET"
+        })
+//    connect();
+    if (responseSession.ok){
+        document.getElementById('response').innerHTML = '';
+        roomNameField.textContent = chatName.value;
+        connectToRoom();
+        submitConnectForm();
+        getLastMessages(roomNameField.textContent);
+    }
 });
 
 function setConnected(connected) {
     document.getElementById('connect').disabled = connected;
     document.getElementById('disconnect').disabled = !connected;
-    document.getElementById('response').innerHTML = '';
+//
 }
 
 async function createRoom(){
@@ -67,9 +84,25 @@ async function connect() {
             let response = await fetch(`/api/checkCapacity/${chatName.value}`);
             let roomNotFull = await response.json();
             if (roomNotFull){
-                roomNameField.textContent = chatName.value;
-                connectToRoom();
-                submitConnectForm();
+                let password = document.getElementById("roomPass");
+                let response = await fetch(`/api/verifyPassword/${chatName.value}/${password.value}`);
+                if (response.ok){
+                    document.getElementById('response').innerHTML = '';
+                    roomNameField.textContent = chatName.value;
+                    connectToRoom();
+                    submitConnectForm();
+                    getLastMessages(roomNameField.textContent);
+                } else {
+                    for (let error of staticErrors){
+                        if (!error.classList.contains("hidden")){
+                            error.classList.toggle("hidden");
+                        }
+                    }
+                    let errorField = document.getElementById("incorrectPassword");
+                    if (errorField.classList.contains("hidden")){
+                        errorField.classList.toggle("hidden");
+                    }
+                }
             } else {
                 for (let error of staticErrors){
                     if (!error.classList.contains("hidden")){
@@ -162,6 +195,7 @@ function showMessageOutput(messageOutput) {
         let timer = document.getElementById("timer");
         roomName.textContent = null;
         timer.textContent = null;
+        document.getElementById('response').innerHTML = '';
         if(stompClient != null) {
             subscription.unsubscribe();
             stompClient.disconnect();
@@ -174,9 +208,29 @@ function showMessageOutput(messageOutput) {
     } else {
         var response = document.getElementById("response");
         var p = document.createElement('p');
-        p.appendChild(document.createTextNode(messageOutput.from + ": "
-          + messageOutput.text + " (" + messageOutput.time + ")"));
+//        p.appendChild(document.createTextNode(messageOutput.from + ": "
+//          + messageOutput.text + " (" + messageOutput.time + ")"));
+        p.appendChild(document.createTextNode("(" + messageOutput.time + ")|" + messageOutput.from + ": "
+                + messageOutput.text));
         response.prepend(p);
+    }
+}
+
+async function getLastMessages(roomName){
+    let responseF = await fetch(`/api/getMessages/${roomName}`,{
+        method:"GET"
+    });
+    let json = await responseF.json();
+    console.log(json);
+    for (let m of json){
+        console.log(m.sendingTime+"|"+m.chatterLogin+"|"+m.text);
+    }
+    for (let message of json){
+        var response = document.getElementById("response");
+        var p = document.createElement('p');
+        p.appendChild(document.createTextNode("(" + message.sendingTime + ")|" + message.chatterLogin + ": "
+                + message.text));
+        response.append(p);
     }
 }
 
@@ -224,6 +278,7 @@ function rejectConnection(){
 }
 
 function disconnect() {
+    document.getElementById('response').innerHTML = '';
     deleteRoom();
 }
 
@@ -268,11 +323,7 @@ function stopTimer(roomName){
     })
 }
 
-window.addEventListener('load', () => {
-    let chatName = document.getElementById("chatName");
-    connect();
-    console.log("wtf");
-});
+
 
 
 

@@ -39,13 +39,24 @@ public class WebController {
     }
 
     @GetMapping({"/login","","/"})
-    public String loginUser(Model model){
+    public String loginUser(Model model, HttpSession session){
+        Chatter sessionChatter = (Chatter)session.getAttribute("chatter");
+//        System.out.println("SESSION CHATTER");
+//        System.out.println(sessionChatter);
+        if (sessionChatter!=null){
+            return "redirect:/main/"+sessionChatter.getLogin();
+        }
         model.addAttribute("chatter", new Chatter());
         return "login";
     }
 
     @GetMapping({"/signup"})
-    public String registerUser(Model model){
+    public String registerUser(Model model, HttpSession session){
+        Chatter sessionChatter = (Chatter)session.getAttribute("chatter");
+//        System.out.println(sessionChatter);
+        if (sessionChatter!=null){
+            return "redirect:/main/"+sessionChatter.getLogin();
+        }
         model.addAttribute("chatter", new Chatter());
         return "register";
     }

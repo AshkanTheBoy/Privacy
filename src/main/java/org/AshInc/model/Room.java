@@ -32,6 +32,7 @@ public class Room {
     @Transient
     private Timer timer;
     private Integer slots = 0;
+    private String password;
     private String expirationTime;
 
     @OneToMany(mappedBy = "room")
@@ -47,6 +48,7 @@ public class Room {
         sb.append(roomName).append('\n');
         sb.append(chatterLogin).append('\n');
         sb.append(slots).append('\n');
+        sb.append("Password: "+password).append('\n');
         sb.append(expirationTime).append('\n');
         sb.append("Messages: { \n");
         for (Message message: messages){

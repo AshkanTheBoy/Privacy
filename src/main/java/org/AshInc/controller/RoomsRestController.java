@@ -1,8 +1,10 @@
 package org.AshInc.controller;
 
 import org.AshInc.model.Chatter;
+import org.AshInc.model.Message;
 import org.AshInc.model.Room;
 import org.AshInc.service.ChatterService;
+import org.AshInc.service.MessageService;
 import org.AshInc.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,9 @@ public class RoomsRestController {
 
     @Autowired
     ChatterService chatterService;
+
+    @Autowired
+    MessageService messageService;
 
     @GetMapping("/rooms")
     public List<Room> getAllRooms(){
@@ -75,6 +80,42 @@ public class RoomsRestController {
             return ResponseEntity.ok("OK");
         } else {
             return ResponseEntity.badRequest().body("Not valid request fields");
+        }
+    }
+
+    @GetMapping("/getMessages/{roomName}")
+    public List<Message> getRoomMessages(@PathVariable("roomName")String roomName){
+        List<Message> ms = messageService.getLastMessagesByRoomName(roomName);
+        System.out.println("CONTROLLER=>");
+        System.out.println(ms);
+        return ms;
+    }
+
+    @GetMapping("/checkForSession/{roomName}")
+    public ResponseEntity<Void> checkForSession(HttpSession session, @PathVariable("roomName") String roomName){
+        Chatter sessionChatter = (Chatter)session.getAttribute("chatter");
+//        Chatter chatter = chatterService.findUserByLogin(sessionChatter.getLogin());
+//        Room room = roomService.findByChatName(roomName);
+        if (sessionChatter!=null&&(boolean)session.getAttribute("isConnected")){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/verifyPassword/{roomName}/{password}")
+    public ResponseEntity<Void> verifyPassword(@PathVariable("roomName") String roomName, @PathVariable("password") String password, HttpSession session){
+        Room room = roomService.findByChatName(roomName);
+        boolean roomExists = room!=null;
+        boolean isPasswordCorrect = room.getPassword().equals(password);
+        Chatter sessionChatter = (Chatter)session.getAttribute("chatter");
+        if (sessionChatter.getRooms().contains(room)){
+            return ResponseEntity.ok().build();
+        }
+        if (roomExists&&isPasswordCorrect){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
