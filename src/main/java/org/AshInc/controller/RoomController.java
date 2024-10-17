@@ -1,7 +1,6 @@
 package org.AshInc.controller;
 
 import org.AshInc.model.Chatter;
-import org.AshInc.model.Message;
 import org.AshInc.model.Room;
 import org.AshInc.service.ChatterService;
 import org.AshInc.service.MessageService;
@@ -63,6 +62,7 @@ public class RoomController {
                 chatter.getRooms().add(existingROom);
                 existingROom.getChatters().add(chatter);
                 session.setAttribute("room", existingROom);
+                session.setAttribute("roomName",existingROom.getRoomName());
                 session.setAttribute("isConnected", true);
                 model.addAttribute("roomName",existingROom.getRoomName());
                 redirectAttributes.addFlashAttribute("roomName", existingROom.getRoomName());
@@ -89,6 +89,7 @@ public class RoomController {
                 chatter.getRooms().add(room);
                 room.getChatters().add(chatter);
                 session.setAttribute("room", room);
+                session.setAttribute("roomName",room.getRoomName());
                 session.setAttribute("isConnected", true);
                 model.addAttribute("roomName", room.getRoomName());
                 redirectAttributes.addFlashAttribute("roomName",room.getRoomName());
@@ -97,6 +98,7 @@ public class RoomController {
                 roomService.addNewRoom(room);
             }
             return "redirect:/main/"+chatter.getLogin();
+//            return "main";
         }
         return "redirect:/main/"+chatter.getLogin();
     }
@@ -104,16 +106,23 @@ public class RoomController {
     @DeleteMapping(value = "/delete/{roomName}")
     public ResponseEntity<Void> deleteRoomByName(@PathVariable("roomName") String roomName){
 //        Chatter sessionChatter = (Chatter) session.getAttribute("chatter");
+//        Room room = roomService.findByChatName(roomName);
+//        for (Chatter chatter: room.getChatters()){
+////            System.out.println(chatter.getLogin());
+//            chatter.getRooms().remove(room);
+//        }
+//        for (Message message: room.getMessages()){
+//            messageService.remove(message);
+//        }
         Room room = roomService.findByChatName(roomName);
-        for (Chatter chatter: room.getChatters()){
-            System.out.println(chatter.getLogin());
-            chatter.getRooms().remove(room);
+        if (room!=null){
+            roomService.deleteRoomByName(roomName);
+            System.out.println("CONTROLLER DELETE");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        for (Message message: room.getMessages()){
-            messageService.remove(message);
-        }
-        roomService.deleteRoomByName(roomName);
-        return ResponseEntity.status(HttpStatus.OK)
-                .build();
+
     }
 }

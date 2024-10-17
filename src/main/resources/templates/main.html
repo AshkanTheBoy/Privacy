@@ -3,48 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/styles.css?v=1.0.3}" type="text/css">
+    <link rel="stylesheet" href="styles.css" th:href="@{/css/styles.css?v=1.0.4}" type="text/css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.4/sockjs.min.js" integrity="sha512-Tp59ajolL5b7bHPv8WsEfdNXqA0bq2NohJ9jK9yy+HRCvwGpjdpc8ay3F2KtbU9dC22QIOS7ek1n2Vep3ohqtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js" integrity="sha512-tL4PIUsPy+Rks1go4kQG8M8/ItpRMvKnbBjQm4d2DQnFwgcBYRRN00QdyQnWSCwNMsoY/MfJY8nHp2CzlNdtZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Document</title>
 </head>
 <body>
-<div class="contacts">
-    <div>
-        <div>
-            <form id="roomForm" th:object="${room}">
-                <p class="hidden" id="invalidFields">Invalid field values</p>
-                <p class="hidden" id="roomFull">This room is full</p>
-                <p class="hidden" id="roomExists">This room already exists</p>
-                <p class="hidden" id="roomNotExists">This room does not exist</p>
-                <p class="hidden" id="roomIsFull">This room is full</p>
-                <p class="hidden" id="incorrectPassword">Incorrect password</p>
-                <input id="chatId" type="text" th:field="${room.roomName}"/>
-                <br>
-                <input id="inputTime" type="text" th:field="${room.expirationTime}">
-                <input id="roomPass" type="password" th:field="${room.password}">
-            </form>
-        </div>
-        <br>
-        <div id="left">
-            <button id="connect" onclick="connect();" >Connect</button>
-            <button id="disconnect" disabled="disabled" onclick="disconnect();">
-                Disconnect
-            </button>
-            <br>
-            <button id="create" onclick="createRoom();">Create Room</button>
-            <button onclick="logOut();">Log out</button>
-        </div>
-
-        <br>
+<div class="settings">
+    <div id="left">
+        <button class="leftButton" id="connect">Join room</button>
+        <button class="rightButton" id="create">New room</button>
     </div>
+    <form class="elHidden" id="roomForm" th:object="${room}">
+        
+        <input id="chatId" type="text" placeholder="Room name" th:field="${room.roomName}"/>
+        <select id="inputTime" name="expTime" th:field="${room.expirationTime}">
+            <option value="001:00:00">1 Hour</option>
+            <option value="024:00:00">1 Day</option>
+            <option value="168:00:00">1 Week</option>
+            <option value="000:01:00">1 Minute</option>
+            <option value="000:00:03">3 Seconds</option>
+        </select>
+<!--                <input id="inputTime" type="text" th:field="${room.expirationTime}">-->
+        <input id="roomPass" placeholder="Room password" type="password" th:field="${room.password}">
+        <button type="button" class="leftButton" id="confirmJoin" onclick="connect();" >Connect</button>
+        <button type="button" class="rightButton" id="confirmCreate" onclick="createRoom();">Create Room</button>
+    </form>
+    <h1 id="errors" class="elHidden">
+        <p class="hidden" id="invalidFields">Invalid field values<br>
+            Room name: 3-32 characters, dashes, underscores<br>
+            Password:5-128 characters</p>
+        <p class="hidden" id="roomFull">This room is full</p>
+        <p class="hidden" id="roomExists">This room already exists</p>
+        <p class="hidden" id="roomNotExists">This room does not exist</p>
+        <p class="hidden" id="roomIsFull">This room is full</p>
+        <p class="hidden" id="incorrectPassword">Incorrect password</p>
+    </h1>
+    
+    <div id="logDisc">
+        <button class="elHidden rightButton" id="disconnect" disabled="disabled" onclick="disconnect();">
+            Disconnect
+        </button>
+        <button class="leftButton" id="logout" onclick="logOut();">Log out</button>
+    </div>
+    
+    
 </div>
 <div class="chat">
     <div id="top">
         <div class="profile"  id="profile" th:text="${session.chatter.login}"></div>
         <div class="timer" id="timer"></div>
-        <div class="room" id="chatName" th:text="${roomName}"></div>
+        <div class="room" id="chatName"></div>
     </div>
     <div class="window" id="chatWindow">
         <div id="response"></div>
@@ -54,29 +64,27 @@
         <button id="sendMessage" onclick="sendMessage();"></button>
     </div>
 </div>
-<div class="settings">
+<div class="chatRooms">
+    <p>To create a new room, enter it's name,<br> choose it's timespan and the password</p>
+    <p>To connect to an existing room, enter it's name and the password</p>
+    <p>If you want to connect to other rooms - disconnect from the current one</p>
+    <button class="testButton" type="button" onclick="disableButtons();disableDiscButton();">Dis</button>
+    <button class="testButton" type="button" onclick="enableButtons();enableDiscButton();">EN</button>
 </div>
 <script th:src="@{/js/timerScript.js?v=1.0.3}" type="text/javascript"></script>
 <script th:src="@{/js/websocketScript.js?v=1.0.4}" type="text/javascript"></script>
+<script th:src="@{/js/layoutScript.js?v=1.0.4}"></script>
 <script>
 
     document.getElementById("textField").addEventListener("keypress",function(event){
         if (event.key == "Enter"){
             event.preventDefault();
             sendMessage();
+            
         }
     })
 
-    window.addEventListener('beforeunload', () => {
-        let chatName = document.getElementById("chatName");
-    //    console.log(chatName);
-    //    let response = verifyRoom(chatName.textContent);
-    //    if (response.ok){
-    //
-    //    }
-        fetch(`/decrementRoomSlots/${chatName.textContent}`);
-        console.log("qwe");
-    });
+
 
 </script>
 </body>

@@ -2,7 +2,14 @@ package org.AshInc.timer;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.AshInc.controller.RoomController;
+import org.AshInc.model.Chatter;
+import org.AshInc.model.Message;
 import org.AshInc.model.OutputMessage;
+import org.AshInc.model.Room;
+import org.AshInc.repository.MessageRepository;
+import org.AshInc.repository.RoomRepository;
+import org.AshInc.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -22,6 +29,7 @@ public class Timer {
     private String roomName;
     private SimpMessagingTemplate template;
     private boolean status = false;
+
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> scheduledFuture;
@@ -68,6 +76,7 @@ public class Timer {
             this.value = String.format("%s:%s:%s",digitsStr[0],digitsStr[1],digitsStr[2]);
             template.convertAndSend("/topic/" + roomName, new OutputMessage(null, this.value, null));
             if (this.value.equals("00:00:00")) {
+                template.convertAndSend("/topic/" + roomName, new OutputMessage("System", "clear", null));
                 stopTimer();
             }
         }

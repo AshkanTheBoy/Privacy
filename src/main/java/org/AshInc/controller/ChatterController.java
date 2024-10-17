@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Controller
 public class ChatterController {
     @Autowired
@@ -28,13 +31,21 @@ public class ChatterController {
         if ((!login.isBlank()||!login.isEmpty())&&(!password.isBlank()||!password.isEmpty())){
             if (chatterService.findUserByLogin(login)!=null){
                 redirectAttributes.addFlashAttribute("error","This user already exists");
-                System.out.println("This user already exists");
                 return "redirect:/signup";
             } else {
-                chatter.setLogin(login);
-                chatter.setPasswordHash(password);
-                chatterService.addNewUser(chatter);
-                return "redirect:/login";
+                Pattern loginPattern = Pattern.compile("^[a-zA-Z0-9_-]{3,32}$");
+                Matcher loginMatcher = loginPattern.matcher(login);
+                Pattern passwordPattern = Pattern.compile("^[a-zA-Z0-9]{5,128}$");
+                Matcher passwordMatcher = passwordPattern.matcher(password);
+                if (loginMatcher.matches()&&passwordMatcher.matches()){
+                    chatter.setLogin(login);
+                    chatter.setPasswordHash(password);
+                    chatterService.addNewUser(chatter);
+                    return "redirect:/login";
+                } else {
+                    redirectAttributes.addFlashAttribute("error","Invalid username or password\nFor login: 3-16 characters, dashes and underscores are allowed\nFor password: 5-128 characters or numbers");
+                    return "redirect:/signup";
+                }
             }
         }
         redirectAttributes.addFlashAttribute("error","Empty inputs are not allowed");

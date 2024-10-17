@@ -25,6 +25,6 @@ public class Message {
     private Room room;
 
     public String toString(){
-        return String.format("Message: [ %d%n %s%n %s%n %s%n %s%n %s%n]",id,text,sendingTime,chatterLogin,roomName,room.getRoomName());
+        return String.format("Message: [ %d%n %s%n %s%n %s%n %s%n %s%n]",id,text,sendingTime,chatterLogin, roomName,room.getRoomName());
     }
 }

@@ -3,7 +3,6 @@ package org.AshInc.controller;
 import org.AshInc.model.OutputMessage;
 import org.AshInc.model.Room;
 import org.AshInc.service.MessageService;
-import org.AshInc.service.ChatterService;
 import org.AshInc.service.RoomService;
 import org.AshInc.timer.Timer;
 import org.AshInc.timer.TimerManager;
@@ -12,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Controller;
+
 import java.util.Date;
 import org.AshInc.model.Message;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +28,9 @@ public class MessagingController {
     private MessageService messageService;
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private RoomController roomController;
 
     public MessagingController(SimpMessagingTemplate template) {
         this.template = template;
@@ -63,7 +64,9 @@ public class MessagingController {
         Pattern pattern = Pattern.compile("^[0-9]{3}:[0-9]{2}:[0-9]{2}$");
         Matcher matcher = pattern.matcher(duration);
         if (matcher.matches()){
+            System.out.println("ROOMNAME "+roomName);
             Room room = roomService.findByChatName(roomName);
+            System.out.println("ROOM "+room);
             Timer newTimer = new Timer(template);
             room.setTimer(newTimer);
             room.getTimer().startTimer(roomName,duration);
@@ -75,7 +78,9 @@ public class MessagingController {
 
     @GetMapping("/stopTimer/{roomName}")
     public void stopTimer(@PathVariable("roomName") String roomName) {
+//        roomController.deleteRoomByName(roomName);
         TimerManager.getTimer(roomName).stopTimer();
+        //return "redirect:/delete/"+roomName;
     }
 
 }

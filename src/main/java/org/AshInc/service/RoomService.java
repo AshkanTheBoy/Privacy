@@ -1,6 +1,9 @@
 package org.AshInc.service;
 
+import org.AshInc.model.Chatter;
+import org.AshInc.model.Message;
 import org.AshInc.model.Room;
+import org.AshInc.repository.MessageRepository;
 import org.AshInc.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,9 @@ import java.util.List;
 public class RoomService {
    @Autowired
    private RoomRepository roomRepository;
+
+   @Autowired
+    MessageRepository messageRepository;
 
    public List<Room> getAllRooms(){
        return roomRepository.findAll();
@@ -27,15 +33,9 @@ public class RoomService {
        roomRepository.save(newRoom);
    }
 
-   public Room findByChatName(String chatName){
-       List<Room> rooms = getAllRooms();
-       for (Room room: rooms){
-           if (room.getRoomName().equals(chatName)){
-               return room;
-           }
-       }
-       return null;
-//       return getAllRooms().stream().filter(room->room.getRoomName().equals(chatName)).findFirst().orElse(null);
+   public Room findByChatName(String roomName){
+       return roomRepository.findRoomByRoomName(roomName);
+//       return getAllRooms().stream().filter(room->room.getRoomName().equals(roomName)).findFirst().orElse(null);
    }
 
    public void incrementTakenSlots(Room room){
@@ -47,8 +47,18 @@ public class RoomService {
     }
 
    @Transactional
-   public void deleteRoomByName(String name){
-       Room room = findByChatName(name);
-       roomRepository.delete(room);
+   public void deleteRoomByName(String roomName){
+       Room room = roomRepository.findRoomByRoomName(roomName);
+       if (room!=null){
+           for (Chatter chatter: room.getChatters()){
+               chatter.getRooms().remove(room);
+           }
+           if (!room.getMessages().isEmpty()){
+               for (Message message: room.getMessages()){
+                   messageRepository.delete(message);
+               }
+           }
+           roomRepository.delete(room);
+       }
    }
 }

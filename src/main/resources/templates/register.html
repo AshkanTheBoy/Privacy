@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Login page</title>
+    <link rel="stylesheet" th:href="@{/css/login&singup.css?v=1.0.3}" type="text/css">
 </head>
 <body>
-    <form method="POST" action="/add" th:object="${chatter}">
-        <input type="text" placeholder="Login" id="login" th:field="${chatter.login}">
-        <br>
-        <input type="password" placeholder="Password" id="password" th:field="${chatter.passwordHash}">
+    <div></div>
+    <div id="main">
+        <h2>Sign up to Privacy</h2>
         <p th:text="${error}"></p>
-        <button type="submit">Register</button>
-    </form>
-<a href="/login">Log in</a>
+        <form id="form" method="POST" action="/add" th:object="${chatter}">
+            <input type="text" placeholder="Login" id="login" th:field="${chatter.login}">
+            <br>
+            <input type="password" placeholder="Password" id="password" th:field="${chatter.passwordHash}">
+            <a id="signup" href="/login">Log in</a>
+            <br>
+            <button id="logButton" type="submit">Register</button>
+        </form>
+    
+    </div>
+    <div></div>
+    
 </body>
 </html>

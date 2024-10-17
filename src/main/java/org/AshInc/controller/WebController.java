@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
@@ -27,6 +24,9 @@ public class WebController {
     @GetMapping(value = "/main/{login}")
     public String getMain(@PathVariable("login") String login, HttpSession session, Model model){
         Chatter chatter = (Chatter) session.getAttribute("chatter");
+        if (chatter==null){
+            return "redirect:/login";
+        }
         model.addAttribute("chatter", chatter);
         Room room = (Room) session.getAttribute("room");
         if (room!=null){
@@ -64,13 +64,7 @@ public class WebController {
     @GetMapping("/logout")
     public String logOut(HttpSession session){
         session.invalidate();
-        Room sessionRoom = (Room) session.getAttribute("room");
-        if (sessionRoom!=null){
-            Room currRoom = roomService.findByChatName(sessionRoom.getRoomName());
-            roomService.decrementTakenSlots(currRoom);
-            roomService.updateRoom(currRoom);
-        }
-        return "redirect:http://localhost:8080/login";
+        return "redirect:/login";
     }
 
 }
