@@ -17,7 +17,7 @@
     </div>
     <form class="elHidden" id="roomForm" th:object="${room}">
         
-        <input id="chatId" type="text" placeholder="Room name" th:field="${room.roomName}"/>
+        <input id="roomName" type="text" placeholder="Room name" th:field="${room.roomName}"/>
         <select id="inputTime" name="expTime" th:field="${room.expirationTime}">
             <option value="001:00:00">1 Hour</option>
             <option value="024:00:00">1 Day</option>
@@ -30,7 +30,7 @@
         <button type="button" class="leftButton" id="confirmJoin" onclick="connect();" >Connect</button>
         <button type="button" class="rightButton" id="confirmCreate" onclick="createRoom();">Create Room</button>
     </form>
-    <h1 id="errors" class="elHidden">
+    <div id="errors">
         <p class="hidden" id="invalidFields">Invalid field values<br>
             Room name: 3-32 characters, dashes, underscores<br>
             Password:5-128 characters</p>
@@ -39,7 +39,7 @@
         <p class="hidden" id="roomNotExists">This room does not exist</p>
         <p class="hidden" id="roomIsFull">This room is full</p>
         <p class="hidden" id="incorrectPassword">Incorrect password</p>
-    </h1>
+    </div>
     
     <div id="logDisc">
         <button class="elHidden rightButton" id="disconnect" disabled="disabled" onclick="disconnect();">

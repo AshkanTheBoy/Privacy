@@ -72,16 +72,9 @@ function disableButtons(){
 }
 
 function enableButtons(){
-    if (form.style.display !=='none'){
-        form.style.display="none";
-        if (!form.classList.contains("elHidden")){
-            form.classList.toggle("elHidden");
-        }
-    } else {
-        form.style.display="grid";
-        if (form.classList.contains("elHidden")){
-            form.classList.toggle("elHidden");
-        }
+    form.style.display="grid";
+    if (form.classList.contains("elHidden")){
+        form.classList.toggle("elHidden");
     }
     let buttons = [connectButton,createButton,confirmCreate,confirmJoin];
     for (let button of buttons){
