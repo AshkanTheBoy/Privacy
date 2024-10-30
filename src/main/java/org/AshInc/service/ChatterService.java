@@ -26,13 +26,7 @@ public class ChatterService {
     }
 
     public Chatter findUserByLogin(String login){
-        List<Chatter> chatters = findAll();
-        for (Chatter chatter: chatters){
-            if (chatter.getLogin().equals(login)){
-                return chatter;
-            }
-        }
-        return null;
-//       return findAll().stream().filter(user->user.getLogin().equals(login)).findFirst().orElse(null);
+        Chatter chatter = chatterRepository.getChatterByLogin(login);
+        return chatter;
     }
 }

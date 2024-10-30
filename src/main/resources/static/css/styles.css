@@ -7,6 +7,8 @@
     border-style: solid;
 }
 
+
+
 .testButton{
     height: 50px;
     width: 50px;
@@ -20,11 +22,7 @@ button:hover{
     cursor: pointer;
     background-color: rgb(57,57,59);
 }
-/*
-.testButton:hover{
-    cursor: pointer;
-}
-*/
+
 .input{
     background-color: var(--main-bg);
     outline: none;
@@ -40,6 +38,7 @@ body{
     padding: 0;
     overflow: hidden;
     min-height: 100%;
+    height: 99vh;
 }
 
 .chat{
@@ -50,14 +49,12 @@ body{
     grid-column-end: 3;
     grid-template-rows: 5% 85% 10%;
     background-color: var(--main-bg);
-    /* border: 5px solid; */
-    min-height: 97vh;
+    min-height: 97%;
     min-width: 400px;
     width: 40vw;
 }
 
 .timer{
-    /* border: 5px solid; */
     width: 35%;
     justify-self: center;
     font-size: 150%;
@@ -69,7 +66,6 @@ body{
 }
 
 .profile{
-    /* border: 5px solid; */
     width: 30%;
     font-size: 150%;
     overflow-x: hidden;
@@ -77,7 +73,6 @@ body{
 }
 
 #chatName{
-    /* border: 5px solid; */
     width: 34%;
     font-size: 150%;
     overflow-x: hidden;
@@ -85,18 +80,16 @@ body{
 }
 
 #response{
-    /* border: 5px solid; */
     min-width: 10vw;
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
     overflow-y: auto;
     scrollbar-width: none;
-    height: 82vh;
+    height: 100%;
 }
 
 .textField{
-    /* border: 1px solid; */
     background-color: var(--main-bg);
     color:rgb(0, 255, 0);
     width: 98%;
@@ -105,25 +98,16 @@ body{
 }
 
 .button,#sendMessage{
-    /* border: 5px solid rgb(0, 255, 0); */
     margin: 10% 10% 10% 10%;
     border-radius: 0px;
 }
 
-.timerButton{
-    /* border: 5px solid rgb(0, 255, 0); */
-    margin-left: 1%;
-    border-radius: 0px;
-}
 
-.button:hover,.timerButton:hover,#sendMessage:hover{
-    background-color: black;
-}
+
 
 .bottom{
     display: grid;
     grid-template-columns: 90% 10%;
-    /* border: 5px solid rgb(0, 255, 0); */
     overflow-y: auto;
     overflow-x: auto;
     scrollbar-width: none;
@@ -133,7 +117,6 @@ body{
 }
 
 .settings{
-    /* border: 5px solid rgb(0, 255, 0); */
     background-color: var(--main-bg);
     display: flex;
     flex-direction: column;
@@ -241,7 +224,6 @@ body{
 }
 
 .chatRooms{
-    /* border: 5px solid rgb(0, 255, 0); */
     background-color: var(--main-bg);
 }
 
@@ -252,7 +234,6 @@ table{
 p{
     border-width: 1px 0px 1px 0px;
     border-style: solid;
-    /* border-color: rgb(0,255,0); */
     width: 100%;
 }
 
@@ -271,7 +252,6 @@ p{
 tr{
     border-width: 3px 0px 3px 0px;
     border-style: solid;
-    /* border-color: rgb(0,255,0); */
     display: flex;
 }
 tr:hover{
@@ -280,4 +260,20 @@ tr:hover{
 
 td{
     width: 100%;
+}
+
+svg,g{
+    height: 100%;
+    width: 100%;
+}
+
+#sendMessage{
+    height: 100%;
+    width: 100%;
+    margin:0;
+    padding: 0;
+}
+
+#sendMessage * {
+    border: none;
 }

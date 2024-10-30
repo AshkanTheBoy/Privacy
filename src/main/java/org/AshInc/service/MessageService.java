@@ -3,6 +3,9 @@ package org.AshInc.service;
 import org.AshInc.model.Message;
 import org.AshInc.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +26,9 @@ public class MessageService {
         messageRepository.delete(message);
     }
 
-    public List<Message> getLastMessagesByRoomName(String roomName){
-        List<Message> ms = messageRepository.findAllByRoomName(roomName,Sort.by("id").descending());
+    public Page<Message> getLastMessagesByRoomName(String roomName){
+        Pageable pageable = PageRequest.of(0,5,Sort.by("id").descending());
+        Page<Message> ms = messageRepository.findAllByRoomName(roomName,pageable);
         return ms;
     }
 

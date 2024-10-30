@@ -1,19 +1,20 @@
 package org.AshInc.controller; // Define the package for this REST controller
 
-import org.AshInc.model.Chatter;
-import org.AshInc.model.Message;
-import org.AshInc.model.Room;
-import org.AshInc.service.ChatterService;
-import org.AshInc.service.MessageService;
-import org.AshInc.service.RoomService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.AshInc.model.Chatter; // Import the Chatter model
+import org.AshInc.model.Message; // Import the Message model
+import org.AshInc.model.Room; // Import the Room model
+import org.AshInc.service.ChatterService; // Import the ChatterService for managing chatters
+import org.AshInc.service.MessageService; // Import the MessageService for message handling
+import org.AshInc.service.RoomService; // Import the RoomService for managing rooms
+import org.springframework.beans.factory.annotation.Autowired; // Import for dependency injection
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity; // Import for building response entities
+import org.springframework.web.bind.annotation.*; // Import for mapping HTTP requests
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import javax.servlet.http.HttpSession; // Import for session management
+import java.util.List; // Import for using List collections
+import java.util.regex.Matcher; // Import for regex matching
+import java.util.regex.Pattern; // Import for regex patterns
 
 // Annotation to indicate that this class is a REST controller
 @RestController
@@ -45,9 +46,6 @@ public class RoomsRestController {
     @GetMapping("/checkCapacity/{chatName}")
     public boolean checkCapacity(@PathVariable("chatName") String chatName) {
         Room room = roomService.findByChatName(chatName); // Find the room by name
-//        if (room == null) {
-//            return true; // If room doesn't exist, return true (considered available)
-//        }
         return room.getSlots() < 2; // Return true if room capacity is less than 2
     }
 
@@ -106,8 +104,6 @@ public class RoomsRestController {
             // Define regex patterns for validation
             Pattern roomPattern = Pattern.compile("^[a-zA-Z0-9_-]{3,32}$");
             Matcher roomMatcher = roomPattern.matcher(roomName);
-//            Pattern timePattern = Pattern.compile("^[0-9]{3}:[0-9]{2}:[0-9]{2}$");
-//            Matcher timeMatcher = timePattern.matcher(time);
             String[] durations = {"168:00:00","024:00:00","001:00:00","000:01:00","000:00:03"};
             boolean isTimeValid = false;
             for (String val: durations){
@@ -132,7 +128,10 @@ public class RoomsRestController {
     // Endpoint to get the last messages from a specific room
     @GetMapping("/getMessages/{roomName}")
     public List<Message> getRoomMessages(@PathVariable("roomName") String roomName) {
-        return messageService.getLastMessagesByRoomName(roomName); // Return last messages for the room
+        //Get the page
+        Page<Message> page = messageService.getLastMessagesByRoomName(roomName);
+        //Recover the contents to make it iterable for processing
+        return page.getContent(); // Return last messages for the room
     }
 
     // Endpoint to check if a session exists for the current user

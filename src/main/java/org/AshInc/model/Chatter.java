@@ -1,14 +1,21 @@
 package org.AshInc.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data // Generates getters, setters, equals, hashCode, and toString methods
 @AllArgsConstructor // Generates a constructor with all parameters
@@ -27,6 +34,7 @@ public class Chatter {
 
     private String login; // Login name for the Chatter
     private String passwordHash; // Hashed password for security
+    private String role = "USER";
 
     @ManyToMany(cascade = CascadeType.ALL) // Defines a many-to-many relationship with Room
     @JoinTable(
@@ -39,6 +47,6 @@ public class Chatter {
     @Override
     public String toString() {
         // Custom toString method to prevent stack overflow
-        return String.format("Chatter: [ %d%n %s%n %s%n %d%n]", id, login, passwordHash, rooms.size());
+        return String.format("Chatter: [ %d%n %s%n %s%n %s%n %d%n]", id, login, passwordHash, role, rooms.size());
     }
 }

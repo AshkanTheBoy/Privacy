@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('roomForm');
     form.classList.add('elHidden');
-    form.style.display = 'none'; // Initially hide the form
+    form.style.display = 'none';
 });
 
 let connectButton = document.getElementById("connect");
@@ -19,13 +19,15 @@ connectButton.addEventListener("click",function(){
     if (form.style.display ==='none'){
         form.style.display="grid";
         form.classList.toggle("elHidden");
-        // addHidingListener(connectButton);
     }
     if (!input.classList.contains("elHidden")){
         input.classList.toggle("elHidden");
     }
     if (confirmJoin.classList.contains("elHidden")){
         confirmJoin.classList.toggle("elHidden");
+        if (confirmJoin.disabled===true){
+            confirmJoin.disabled = false;
+        }
     }
     if (!confirmCreate.classList.contains("elHidden")){
         confirmCreate.classList.toggle("elHidden");
@@ -36,7 +38,6 @@ createButton.addEventListener("click",function(){
     if (form.style.display ==='none'){
         form.style.display="grid";
         form.classList.toggle("elHidden");
-        //addHidingListener(createButton);
     }
     if (input.classList.contains("elHidden")){
         input.classList.toggle("elHidden");
@@ -46,6 +47,9 @@ createButton.addEventListener("click",function(){
     }
     if (confirmCreate.classList.contains("elHidden")){
         confirmCreate.classList.toggle("elHidden");
+        if (confirmCreate.disabled===true){
+            confirmCreate.disabled = false;
+        }
     }
 })
 
@@ -80,6 +84,17 @@ function enableButtons(){
     for (let button of buttons){
         if (button.disabled){
             button.disabled = false;
+        }
+    }
+    if (input.classList.contains("elHidden")){
+        if (!confirmCreate.classList.contains("elHidden")){
+            confirmCreate.classList.toggle("elHidden");
+            confirmCreate.disabled=true;
+        }
+    } else if (!input.classList.contains("elHidden")){
+        if (!confirmJoin.classList.contains("elHidden")){
+            confirmJoin.classList.toggle("elHidden");
+            confirmJoin.disabled=true;
         }
     }
 }

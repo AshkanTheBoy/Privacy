@@ -1,23 +1,24 @@
 package org.AshInc.controller; // Define the package for this controller
 
-import org.AshInc.model.Chatter;
-import org.AshInc.model.Room;
-import org.AshInc.service.ChatterService;
-import org.AshInc.service.MessageService;
-import org.AshInc.service.RoomService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.AshInc.model.Chatter; // Import the Chatter model
+import org.AshInc.model.Room; // Import the Room model
+import org.AshInc.service.ChatterService; // Import the ChatterService for managing chatters
+import org.AshInc.service.MessageService; // Import the MessageService for message handling
+import org.AshInc.service.RoomService; // Import the RoomService for managing rooms
+import org.springframework.beans.factory.annotation.Autowired; // Import for dependency injection
+import org.springframework.http.HttpStatus; // Import for HTTP status codes
+import org.springframework.http.ResponseEntity; // Import for building response entities
+import org.springframework.stereotype.Controller; // Import for defining a controller
+import org.springframework.ui.Model; // Import for passing data to views
+import org.springframework.web.bind.annotation.*; // Import for mapping HTTP requests
+import org.springframework.web.servlet.mvc.support.RedirectAttributes; // Import for flash attributes
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
+import javax.servlet.http.HttpSession; // Import for session management
+import java.util.List; // Import for using List collections
 
 // Annotation to indicate that this class is a Spring MVC controller
 @Controller
+@RequestMapping("/room")
 public class RoomController {
     @Autowired
     RoomService roomService; // Automatically inject RoomService

@@ -11,10 +11,11 @@
         <h2>Sign up to Privacy</h2>
         <p th:text="${error}"></p>
         <form id="form" method="POST" action="/add" th:object="${chatter}">
-            <input type="text" placeholder="Login" id="login" th:field="${chatter.login}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="text" placeholder="Login" id="login" th:field="${chatter.login}" required>
             <br>
-            <input type="password" placeholder="Password" id="password" th:field="${chatter.passwordHash}">
-            <a id="signup" href="/login">Log in</a>
+            <input type="password" placeholder="Password" id="password" th:field="${chatter.passwordHash}" required>
+            <a id="signup" href="/customLogin">Log in</a>
             <br>
             <button id="logButton" type="submit">Register</button>
         </form>

@@ -1,24 +1,26 @@
 package org.AshInc.controller; // Define the package for this controller
 
-import org.AshInc.model.Message;
-import org.AshInc.model.OutputMessage;
-import org.AshInc.model.Room;
-import org.AshInc.service.MessageService;
-import org.AshInc.service.RoomService;
-import org.AshInc.timer.Timer;
-import org.AshInc.timer.TimerManager;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.AshInc.model.OutputMessage; // Import the OutputMessage model for sending messages
+import org.AshInc.model.Room; // Import the Room model
+import org.AshInc.service.MessageService; // Import the MessageService for message handling
+import org.AshInc.service.RoomService; // Import the RoomService for room management
+import org.AshInc.timer.Timer; // Import the Timer class for managing timers
+import org.AshInc.timer.TimerManager; // Import TimerManager for managing multiple timers
+import org.apache.commons.text.StringEscapeUtils; // Import for escaping HTML
+import org.springframework.beans.factory.annotation.Autowired; // Import for dependency injection
+import org.springframework.messaging.handler.annotation.DestinationVariable; // Import for mapping destination variables
+import org.springframework.messaging.handler.annotation.MessageMapping; // Import for message mapping
+import org.springframework.messaging.simp.SimpMessagingTemplate; // Import for sending messages to clients
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Date; // Import for handling date and time
+import org.AshInc.model.Message; // Import the Message model
+import org.springframework.web.bind.annotation.*; // Import for mapping HTTP requests
+
+import java.text.SimpleDateFormat; // Import for formatting dates
 
 // Annotation to indicate that this class is a REST controller
 @RestController
+@RequestMapping("/chat")
 public class MessagingController {
 
     private final SimpMessagingTemplate template; // Template for sending messages

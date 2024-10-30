@@ -92,11 +92,7 @@ public class Timer {
             scheduledFuture.cancel(false); // Cancels the scheduled task
         }
         status = false; // Updates the status to inactive
-        System.out.println("BEFORE DELETION MESSAGE");
-        System.out.println("ROOMSERVICE "+roomService);
-        System.out.println("ROOMNAME "+roomName);
         roomService.deleteRoomByName(roomName);
-        System.out.println("AFTER DELETION MESSAGE");
     }
 
     // Constructor for dependency injection

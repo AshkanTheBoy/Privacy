@@ -10,11 +10,16 @@ let inputChatName = document.getElementById("roomName"); // Input for room name
 let expTime = document.getElementById("inputTime"); // Input for expiration time
 let password = document.getElementById("roomPass"); // Input for room password
 
+let csrfToken;
+let csrfHeader;
+
 // Wait for the DOM to fully load
 document.addEventListener('DOMContentLoaded', () => {
     // Get all error fields that are initially hidden
     var errorFields = document.getElementsByClassName("hidden");
     staticErrors = Array.from(errorFields); // Convert HTMLCollection to an array
+    csrfToken = getCsrfToken();
+    csrfHeader = getCsrfHeader();
 });
 
 // Handle window load event
@@ -116,6 +121,11 @@ async function connect() {
                         connectToRoom(roomNameField.textContent); // Connect to the room
                         submitConnectForm(); // Submit connection form
                         getLastMessages(roomNameField.textContent); // Get last messages in the room
+                        for (let error of staticErrors) {
+                            if (!error.classList.contains("hidden")) {
+                                error.classList.toggle("hidden");
+                            }
+                        }
                     } else {
                         // Show incorrect password error
                         for (let error of staticErrors) {
@@ -214,7 +224,6 @@ async function doFieldsAlignWithSession(chatterLogin, roomName) {
 async function showMessageOutput(messageOutput) {
     if (messageOutput.from === "System" && messageOutput.text === "clear") {
         let timer = document.getElementById("timer");
-        //await deleteRoom(); // Delete the room on system message
         roomNameField.textContent = null; // Clear room name display
         timer.textContent = null; // Clear timer display
         document.getElementById('response').innerHTML = ''; // Clear previous messages
@@ -242,9 +251,6 @@ async function getLastMessages(roomName) {
         method: "GET"
     });
     let json = await responseF.json(); // Parse JSON response
-    for (let m of json) {
-        console.log(m.sendingTime + "|" + m.chatterLogin + "|" + m.text); // Log each message to console
-    }
     for (let message of json) {
         var response = document.getElementById("response"); // Get response display area
         var p = document.createElement('p'); // Create new paragraph for message
@@ -255,10 +261,11 @@ async function getLastMessages(roomName) {
 
 // Function to save a message to the server
 function saveMessage(text, from, roomName) {
-    fetch('http://localhost:8080/saveMessage', {
+    fetch('/chat/saveMessage', {
         method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify({
             "text": `${text}`,
@@ -276,16 +283,6 @@ async function deleteRoom() {
         fetch(`/main/${chatterName.textContent}`, {
             method: "GET" // Redirect to main after deletion
         });
-//        fetch(`/delete/${roomNameField.textContent}`, {
-//            method: "DELETE"
-//        })
-//        .then(response => {
-//            if (response.ok) {
-//                fetch(`/main/${chatterName.textContent}`, {
-//                    method: "GET" // Redirect to main after deletion
-//                });
-//            }
-//        });
     } else {
         console.log("Error: either the request is not authorized or the room was already deleted"); // Log error
     }
@@ -305,8 +302,11 @@ async function disconnect() {
 function submitAddForm() {
     let form = document.getElementById("roomForm"); // Get the room form
     const formData = new FormData(form); // Create FormData object from the form
-    fetch('http://localhost:8080/addRoom', {
+    fetch('/room/addRoom', {
         method: "POST",
+        headers:{
+            [csrfHeader]: csrfToken
+        },
         body: formData // Submit the form data
     })
     .then(response => {
@@ -323,22 +323,25 @@ function submitAddForm() {
 function submitConnectForm() {
     let form = document.getElementById("roomForm"); // Get the room form
     const formData = new FormData(form); // Create FormData object from the form
-    fetch(`/main/connectRoom`, {
+    fetch(`/room/main/connectRoom`, {
         method: "POST",
+        headers:{
+            [csrfHeader]: csrfToken
+        },
         body: formData // Submit the form data
     });
 }
 
 // Function to start the scheduled timer for the room
 function startScheduledTimer() {
-    fetch(`/startTimer/${inputTime.value}/${roomNameField.textContent}`, {
+    fetch(`/chat/startTimer/${inputTime.value}/${roomNameField.textContent}`, {
         method: "GET"
     });
 }
 
 // Function to stop the timer for the room
 function stopTimer(roomName) {
-    fetch(`/stopTimer/${roomName}`, {
+    fetch(`/chat/stopTimer/${roomName}`, {
         method: "GET"
     });
 }
@@ -355,4 +358,14 @@ async function logOut() {
 // Function to verify if a room exists
 async function verifyRoom(roomName) {
     return await fetch(`/api/verifyRoom?room=${roomName}`); // Return the fetch promise for verification
+}
+
+// Function to get CSRF token from meta tag
+function getCsrfToken() {
+    return document.querySelector('meta[name="_csrf"]').getAttribute('content');
+}
+
+// Function to get the CSRF header name from meta tag
+function getCsrfHeader() {
+    return document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 }
