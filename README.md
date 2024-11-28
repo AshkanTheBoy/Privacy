@@ -1,6 +1,7 @@
 ![repository-open-graph-template](https://github.com/user-attachments/assets/465cab3e-9fee-4590-991b-7bc6da68f596)
 
     Simple text chat-app with Spring Boot&WebSockets
+    
     1. Users can engage in 1 on 1 text messaging.
     
     2. Users can create and join to password protected rooms.
